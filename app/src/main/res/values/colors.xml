@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="sky_blue">#FF7EC8F2</color>
+    <color name="blush_pink">#FFF7A8C4</color>
+    <color name="deep_navy">#FF1E2A4A</color>
+    <color name="cloud_white">#FFFFFFFF</color>
+    <color name="window_background">#FFF7FAFD</color>
+    <color name="splash_background">#FFFFFFFF</color>
+</resources>
