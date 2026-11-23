@@ -11,6 +11,10 @@ A nail art inspiration app for Android, built with Kotlin, Jetpack Compose and M
 
 All design cards are generated gradient tiles from local sample data, so Phase 1 needs no network access or image assets.
 
+## UI Mockup
+
+![NailSky Phase 1 UI Mockup](docs/nailsky-mockup.svg)
+
 ## Tech
 
 | | |

@@ -1,0 +1,477 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 760" width="1160" height="760" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <!-- Drop shadows -->
+    <filter id="phoneShadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#0F1626" flood-opacity="0.22"/>
+    </filter>
+    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#1E2A4A" flood-opacity="0.08"/>
+    </filter>
+
+    <!-- Light mode sample gradients -->
+    <linearGradient id="bgCanvas" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#EEF6FC"/>
+      <stop offset="50%" stop-color="#F8F3F9"/>
+      <stop offset="100%" stop-color="#E8F2FA"/>
+    </linearGradient>
+    <linearGradient id="gradFrench" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFF1F5"/>
+      <stop offset="100%" stop-color="#F7A8C4"/>
+    </linearGradient>
+    <linearGradient id="gradFloral" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F7A8C4"/>
+      <stop offset="55%" stop-color="#FFD6E5"/>
+      <stop offset="100%" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <linearGradient id="gradStarry" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1E2A4A"/>
+      <stop offset="50%" stop-color="#4A5C9A"/>
+      <stop offset="100%" stop-color="#7EC8F2"/>
+    </linearGradient>
+    <linearGradient id="gradMilky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F5E6DA"/>
+      <stop offset="100%" stop-color="#E8CFC0"/>
+    </linearGradient>
+    <linearGradient id="gradSkyOmbre" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7EC8F2"/>
+      <stop offset="100%" stop-color="#F7A8C4"/>
+    </linearGradient>
+    <linearGradient id="gradRoseGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6D1C1"/>
+      <stop offset="50%" stop-color="#D99A8A"/>
+      <stop offset="100%" stop-color="#F7A8C4"/>
+    </linearGradient>
+
+    <!-- Dark mode deepened sample gradients (lerp 45% toward #0F1626) -->
+    <linearGradient id="gradFrenchDark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#938F98"/>
+      <stop offset="100%" stop-color="#8F667D"/>
+    </linearGradient>
+    <linearGradient id="gradFloralDark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8F667D"/>
+      <stop offset="55%" stop-color="#93808F"/>
+      <stop offset="100%" stop-color="#9397A0"/>
+    </linearGradient>
+    <linearGradient id="gradStarryDark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#17213A"/>
+      <stop offset="50%" stop-color="#2F3C66"/>
+      <stop offset="100%" stop-color="#4C7896"/>
+    </linearGradient>
+    <linearGradient id="gradMilkyDark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8E8889"/>
+      <stop offset="100%" stop-color="#877B7B"/>
+    </linearGradient>
+    <linearGradient id="gradSkyOmbreDark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4C7896"/>
+      <stop offset="100%" stop-color="#8F667D"/>
+    </linearGradient>
+    <linearGradient id="gradScrim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.45"/>
+    </linearGradient>
+
+    <!-- Reusable NailSky Vector Logo (from res/drawable/nailsky_logo.xml) -->
+    <g id="nailskyLogo">
+      <circle cx="54" cy="54" r="54" fill="#1E2A4A"/>
+      <g transform="translate(54,52) scale(1.3) translate(-54,-54)">
+        <!-- Bottle body -->
+        <rect x="38" y="52" width="32" height="30" rx="7" fill="#F7A8C4"/>
+        <!-- Glass highlight -->
+        <rect x="43" y="58" width="3" height="18" rx="1.5" fill="#FFFFFF" fill-opacity="0.55"/>
+        <!-- Neck -->
+        <path d="M49.5,46 H58.5 A1.5,1.5 0 0,1 60,47.5 V52 H48 V47.5 A1.5,1.5 0 0,1 49.5,46 Z" fill="#FFFFFF"/>
+        <!-- Crescent cap / brush -->
+        <path d="M56,24 A11,11 0 0,0 56,46 A13,13 0 0,1 56,24 Z" fill="#7EC8F2"/>
+        <!-- Sparkle star -->
+        <path d="M59,30 L60.2,33.8 L64,35 L60.2,36.2 L59,40 L57.8,36.2 L54,35 L57.8,33.8 Z" fill="#FFFFFF"/>
+        <circle cx="68" cy="28" r="1.5" fill="#FFFFFF"/>
+      </g>
+    </g>
+
+    <!-- Reusable Stylized Nail Shapes overlay (from DesignCard.kt NailShapes) -->
+    <g id="nailOverlay">
+      <rect x="38" y="34" width="16" height="44" rx="8" fill="#FFFFFF" fill-opacity="0.32"/>
+      <rect x="62" y="26" width="16" height="52" rx="8" fill="#FFFFFF" fill-opacity="0.32"/>
+      <rect x="86" y="32" width="16" height="46" rx="8" fill="#FFFFFF" fill-opacity="0.32"/>
+      <circle cx="24" cy="22" r="2.2" fill="#FFFFFF" fill-opacity="0.65"/>
+      <circle cx="116" cy="84" r="1.6" fill="#FFFFFF" fill-opacity="0.65"/>
+      <circle cx="34" cy="92" r="1.3" fill="#FFFFFF" fill-opacity="0.65"/>
+    </g>
+
+    <!-- Heart icons -->
+    <path id="heartFilled" d="M8,14.2 L6.9,13.2 C3.1,9.7 0.6,7.4 0.6,4.6 C0.6,2.3 2.4,0.5 4.7,0.5 C6,0.5 7.2,1.1 8,2.1 C8.8,1.1 10,0.5 11.3,0.5 C13.6,0.5 15.4,2.3 15.4,4.6 C15.4,7.4 12.9,9.7 9.1,13.2 L8,14.2 Z"/>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="1160" height="760" fill="url(#bgCanvas)"/>
+
+  <!-- Header Banner -->
+  <text x="580" y="42" text-anchor="middle" font-size="22" font-weight="700" fill="#1E2A4A">NailSky — Phase 1 Android UI Mockup (Jetpack Compose · Material 3)</text>
+  <text x="580" y="65" text-anchor="middle" font-size="13" fill="#5A6580">Sky Blue #7EC8F2 · Blush Pink #F7A8C4 · Deep Navy #1E2A4A · Night #0F1626 / #1A2338</text>
+
+  <!-- ========================================================= -->
+  <!-- PHONE 1: HOME SCREEN (LIGHT MODE)                         -->
+  <!-- ========================================================= -->
+  <g transform="translate(45, 92)">
+    <!-- Phone Frame -->
+    <rect x="0" y="0" width="320" height="620" rx="36" fill="#1E2A4A" filter="url(#phoneShadow)"/>
+    <rect x="8" y="8" width="304" height="604" rx="30" fill="#F7FAFD"/>
+
+    <!-- Status Bar -->
+    <text x="28" y="28" font-size="11" font-weight="600" fill="#1E2A4A">9:41</text>
+    <circle cx="160" cy="22" r="4" fill="#1E2A4A" fill-opacity="0.2"/>
+    <rect x="268" y="19" width="18" height="9" rx="2" stroke="#1E2A4A" stroke-width="1.2" fill="none"/>
+    <rect x="270" y="21" width="12" height="5" rx="1" fill="#1E2A4A"/>
+
+    <!-- Top App Bar: Logo + NailSky Wordmark + Search -->
+    <g transform="translate(24, 42) scale(0.30)">
+      <use href="#nailskyLogo"/>
+    </g>
+    <text x="66" y="64" font-size="19" font-weight="700" fill="#1E2A4A">Nail<tspan fill="#E0679A">Sky</tspan></text>
+    <!-- Search Icon -->
+    <circle cx="282" cy="56" r="6.5" stroke="#1E2A4A" stroke-width="1.8" fill="none"/>
+    <line x1="287" y1="61" x2="292" y2="66" stroke="#1E2A4A" stroke-width="1.8" stroke-linecap="round"/>
+
+    <!-- Category Chips -->
+    <g transform="translate(24, 84)">
+      <rect x="0" y="0" width="44" height="26" rx="13" fill="#7EC8F2"/>
+      <text x="22" y="17" text-anchor="middle" font-size="11" font-weight="600" fill="#1E2A4A">All</text>
+
+      <rect x="52" y="0" width="58" height="26" rx="13" fill="#FFFFFF" stroke="#C9D3E0"/>
+      <text x="81" y="17" text-anchor="middle" font-size="11" font-weight="500" fill="#5A6580">French</text>
+
+      <rect x="118" y="0" width="54" height="26" rx="13" fill="#FFFFFF" stroke="#C9D3E0"/>
+      <text x="145" y="17" text-anchor="middle" font-size="11" font-weight="500" fill="#5A6580">Floral</text>
+
+      <rect x="180" y="0" width="56" height="26" rx="13" fill="#FFFFFF" stroke="#C9D3E0"/>
+      <text x="208" y="17" text-anchor="middle" font-size="11" font-weight="500" fill="#5A6580">Glitter</text>
+
+      <rect x="244" y="0" width="48" height="26" rx="13" fill="#FFFFFF" stroke="#C9D3E0"/>
+      <text x="268" y="17" text-anchor="middle" font-size="11" font-weight="500" fill="#5A6580">Min…</text>
+    </g>
+
+    <!-- Section: Trending -->
+    <text x="24" y="136" font-size="16" font-weight="700" fill="#1E2A4A">Trending</text>
+
+    <!-- Trending Horizontal Carousel Cards -->
+    <g transform="translate(24, 146)">
+      <!-- Trending Card 1 -->
+      <g filter="url(#cardShadow)">
+        <rect x="0" y="0" width="168" height="106" rx="20" fill="url(#gradFrench)"/>
+        <g transform="translate(14, 0) scale(0.95)">
+          <use href="#nailOverlay"/>
+        </g>
+        <rect x="0" y="54" width="168" height="52" rx="20" fill="url(#gradScrim)"/>
+        <!-- Heart toggle -->
+        <circle cx="146" cy="20" r="13" fill="#FFFFFF" fill-opacity="0.88"/>
+        <use href="#heartFilled" x="138" y="13" fill="#E0679A"/>
+        <text x="12" y="83" font-size="12" font-weight="700" fill="#FFFFFF">Classic French Tip</text>
+        <text x="12" y="97" font-size="10" fill="#FFFFFF" fill-opacity="0.88">French</text>
+      </g>
+
+      <!-- Trending Card 2 (partially visible) -->
+      <g transform="translate(180, 0)" filter="url(#cardShadow)">
+        <rect x="0" y="0" width="108" height="106" rx="20" fill="url(#gradFloral)"/>
+        <g transform="translate(-8, 0) scale(0.95)">
+          <use href="#nailOverlay"/>
+        </g>
+        <rect x="0" y="54" width="108" height="52" rx="20" fill="url(#gradScrim)"/>
+        <text x="12" y="83" font-size="12" font-weight="700" fill="#FFFFFF">Cherry Blos…</text>
+        <text x="12" y="97" font-size="10" fill="#FFFFFF" fill-opacity="0.88">Floral</text>
+      </g>
+    </g>
+
+    <!-- Section: Inspiration (2-Column Staggered Grid) -->
+    <text x="24" y="278" font-size="16" font-weight="700" fill="#1E2A4A">Inspiration</text>
+    <text x="296" y="278" text-anchor="end" font-size="11" font-weight="500" fill="#5A6580">18 designs</text>
+
+    <!-- Left Column Card 1 (height 126) -->
+    <g transform="translate(24, 290)" filter="url(#cardShadow)">
+      <rect x="0" y="0" width="130" height="132" rx="18" fill="#FFFFFF"/>
+      <rect x="0" y="0" width="130" height="92" rx="18" fill="url(#gradStarry)"/>
+      <g transform="translate(-5, -8) scale(0.92)">
+        <use href="#nailOverlay"/>
+      </g>
+      <circle cx="110" cy="18" r="12" fill="#FFFFFF" fill-opacity="0.85"/>
+      <use href="#heartFilled" x="102" y="11" fill="#5A6580" fill-opacity="0.45"/>
+      <text x="10" y="110" font-size="11.5" font-weight="700" fill="#1E2A4A">Starry Night Glitter</text>
+      <text x="10" y="124" font-size="10" fill="#5A6580">Glitter</text>
+    </g>
+
+    <!-- Right Column Card 1 (Taller staggered card - height 156) -->
+    <g transform="translate(166, 290)" filter="url(#cardShadow)">
+      <rect x="0" y="0" width="130" height="162" rx="18" fill="#FFFFFF"/>
+      <rect x="0" y="0" width="130" height="122" rx="18" fill="url(#gradSkyOmbre)"/>
+      <g transform="translate(-5, 6) scale(0.95)">
+        <use href="#nailOverlay"/>
+      </g>
+      <circle cx="110" cy="18" r="12" fill="#FFFFFF" fill-opacity="0.85"/>
+      <use href="#heartFilled" x="102" y="11" fill="#E0679A"/>
+      <text x="10" y="140" font-size="11.5" font-weight="700" fill="#1E2A4A">Sky Ombre</text>
+      <text x="10" y="154" font-size="10" fill="#5A6580">Ombre</text>
+    </g>
+
+    <!-- Left Column Card 2 (starts higher than right column card 2!) -->
+    <g transform="translate(24, 434)" filter="url(#cardShadow)">
+      <rect x="0" y="0" width="130" height="112" rx="18" fill="#FFFFFF"/>
+      <rect x="0" y="0" width="130" height="74" rx="18" fill="url(#gradMilky)"/>
+      <g transform="translate(-5, -14) scale(0.88)">
+        <use href="#nailOverlay"/>
+      </g>
+      <circle cx="110" cy="18" r="12" fill="#FFFFFF" fill-opacity="0.85"/>
+      <use href="#heartFilled" x="102" y="11" fill="#5A6580" fill-opacity="0.45"/>
+      <text x="10" y="92" font-size="11.5" font-weight="700" fill="#1E2A4A">Milky Nude</text>
+      <text x="10" y="105" font-size="10" fill="#5A6580">Minimal</text>
+    </g>
+
+    <!-- Right Column Card 2 -->
+    <g transform="translate(166, 464)" filter="url(#cardShadow)">
+      <rect x="0" y="0" width="130" height="82" rx="18" fill="#FFFFFF"/>
+      <rect x="0" y="0" width="130" height="54" rx="18" fill="url(#gradRoseGold)"/>
+      <text x="10" y="70" font-size="11.5" font-weight="700" fill="#1E2A4A">Rose Gold Sparkle</text>
+    </g>
+
+    <!-- Bottom Navigation Bar (Light) -->
+    <rect x="8" y="548" width="304" height="64" rx="24" fill="#FFFFFF"/>
+    <line x1="8" y1="548" x2="312" y2="548" stroke="#E2E8F0" stroke-width="1"/>
+    <!-- Home (Selected) -->
+    <rect x="26" y="556" width="48" height="24" rx="12" fill="#DDF1FC"/>
+    <path d="M50,561 L42,568 V575 H47 V570 H53 V575 H58 V568 Z" fill="#1E2A4A"/>
+    <text x="50" y="596" text-anchor="middle" font-size="10" font-weight="700" fill="#1E2A4A">Home</text>
+    <!-- Explore -->
+    <circle cx="123" cy="568" r="7" stroke="#5A6580" stroke-width="1.6" fill="none"/>
+    <polygon points="121,570 123,564 125,568 123,572" fill="#5A6580"/>
+    <text x="123" y="596" text-anchor="middle" font-size="10" fill="#5A6580">Explore</text>
+    <!-- Saved -->
+    <use href="#heartFilled" x="189" y="561" fill="#5A6580" fill-opacity="0.6"/>
+    <text x="197" y="596" text-anchor="middle" font-size="10" fill="#5A6580">Saved</text>
+    <!-- Profile -->
+    <circle cx="270" cy="565" r="4" stroke="#5A6580" stroke-width="1.6" fill="none"/>
+    <path d="M263,575 C263,571 277,571 277,575" stroke="#5A6580" stroke-width="1.6" fill="none"/>
+    <text x="270" y="596" text-anchor="middle" font-size="10" fill="#5A6580">Profile</text>
+
+    <text x="160" y="644" text-anchor="middle" font-size="13" font-weight="700" fill="#1E2A4A">1. Home Screen (Light Mode)</text>
+  </g>
+
+  <!-- ========================================================= -->
+  <!-- PHONE 2: HOME SCREEN (DARK MODE)                          -->
+  <!-- ========================================================= -->
+  <g transform="translate(420, 92)">
+    <!-- Phone Frame -->
+    <rect x="0" y="0" width="320" height="620" rx="36" fill="#0A0F1B" filter="url(#phoneShadow)"/>
+    <rect x="8" y="8" width="304" height="604" rx="30" fill="#0F1626"/>
+
+    <!-- Status Bar -->
+    <text x="28" y="28" font-size="11" font-weight="600" fill="#E8ECF5">9:41</text>
+    <circle cx="160" cy="22" r="4" fill="#E8ECF5" fill-opacity="0.2"/>
+    <rect x="268" y="19" width="18" height="9" rx="2" stroke="#E8ECF5" stroke-width="1.2" fill="none"/>
+    <rect x="270" y="21" width="12" height="5" rx="1" fill="#E8ECF5"/>
+
+    <!-- Top App Bar: Logo + NailSky Wordmark + Search -->
+    <g transform="translate(24, 42) scale(0.30)">
+      <use href="#nailskyLogo"/>
+    </g>
+    <text x="66" y="64" font-size="19" font-weight="700" fill="#E8ECF5">Nail<tspan fill="#8FD3FF">Sky</tspan></text>
+    <!-- Search Icon -->
+    <circle cx="282" cy="56" r="6.5" stroke="#E8ECF5" stroke-width="1.8" fill="none"/>
+    <line x1="287" y1="61" x2="292" y2="66" stroke="#E8ECF5" stroke-width="1.8" stroke-linecap="round"/>
+
+    <!-- Category Chips (Dark) -->
+    <g transform="translate(24, 84)">
+      <rect x="0" y="0" width="44" height="26" rx="13" fill="#8FD3FF"/>
+      <text x="22" y="17" text-anchor="middle" font-size="11" font-weight="600" fill="#0D2A40">All</text>
+
+      <rect x="52" y="0" width="58" height="26" rx="13" fill="#1A2338" stroke="#3A4662"/>
+      <text x="81" y="17" text-anchor="middle" font-size="11" font-weight="500" fill="#A9B3C8">French</text>
+
+      <rect x="118" y="0" width="54" height="26" rx="13" fill="#1A2338" stroke="#3A4662"/>
+      <text x="145" y="17" text-anchor="middle" font-size="11" font-weight="500" fill="#A9B3C8">Floral</text>
+
+      <rect x="180" y="0" width="56" height="26" rx="13" fill="#1A2338" stroke="#3A4662"/>
+      <text x="208" y="17" text-anchor="middle" font-size="11" font-weight="500" fill="#A9B3C8">Glitter</text>
+
+      <rect x="244" y="0" width="48" height="26" rx="13" fill="#1A2338" stroke="#3A4662"/>
+      <text x="268" y="17" text-anchor="middle" font-size="11" font-weight="500" fill="#A9B3C8">Min…</text>
+    </g>
+
+    <!-- Section: Trending -->
+    <text x="24" y="136" font-size="16" font-weight="700" fill="#E8ECF5">Trending</text>
+
+    <!-- Trending Horizontal Carousel Cards (Deeper Dark Mode Tones) -->
+    <g transform="translate(24, 146)">
+      <g>
+        <rect x="0" y="0" width="168" height="106" rx="20" fill="url(#gradFrenchDark)"/>
+        <g transform="translate(14, 0) scale(0.95)">
+          <use href="#nailOverlay"/>
+        </g>
+        <rect x="0" y="54" width="168" height="52" rx="20" fill="url(#gradScrim)"/>
+        <circle cx="146" cy="20" r="13" fill="#1A2338" fill-opacity="0.88"/>
+        <use href="#heartFilled" x="138" y="13" fill="#FFB3CF"/>
+        <text x="12" y="83" font-size="12" font-weight="700" fill="#FFFFFF">Classic French Tip</text>
+        <text x="12" y="97" font-size="10" fill="#FFFFFF" fill-opacity="0.88">French</text>
+      </g>
+
+      <g transform="translate(180, 0)">
+        <rect x="0" y="0" width="108" height="106" rx="20" fill="url(#gradFloralDark)"/>
+        <g transform="translate(-8, 0) scale(0.95)">
+          <use href="#nailOverlay"/>
+        </g>
+        <rect x="0" y="54" width="108" height="52" rx="20" fill="url(#gradScrim)"/>
+        <text x="12" y="83" font-size="12" font-weight="700" fill="#FFFFFF">Cherry Blos…</text>
+        <text x="12" y="97" font-size="10" fill="#FFFFFF" fill-opacity="0.88">Floral</text>
+      </g>
+    </g>
+
+    <!-- Section: Inspiration -->
+    <text x="24" y="278" font-size="16" font-weight="700" fill="#E8ECF5">Inspiration</text>
+    <text x="296" y="278" text-anchor="end" font-size="11" font-weight="500" fill="#A9B3C8">18 designs</text>
+
+    <!-- Left Column Card 1 -->
+    <g transform="translate(24, 290)">
+      <rect x="0" y="0" width="130" height="132" rx="18" fill="#1A2338"/>
+      <rect x="0" y="0" width="130" height="92" rx="18" fill="url(#gradStarryDark)"/>
+      <g transform="translate(-5, -8) scale(0.92)">
+        <use href="#nailOverlay"/>
+      </g>
+      <circle cx="110" cy="18" r="12" fill="#1A2338" fill-opacity="0.85"/>
+      <use href="#heartFilled" x="102" y="11" fill="#A9B3C8" fill-opacity="0.55"/>
+      <text x="10" y="110" font-size="11.5" font-weight="700" fill="#E8ECF5">Starry Night Glitter</text>
+      <text x="10" y="124" font-size="10" fill="#A9B3C8">Glitter</text>
+    </g>
+
+    <!-- Right Column Card 1 -->
+    <g transform="translate(166, 290)">
+      <rect x="0" y="0" width="130" height="162" rx="18" fill="#1A2338"/>
+      <rect x="0" y="0" width="130" height="122" rx="18" fill="url(#gradSkyOmbreDark)"/>
+      <g transform="translate(-5, 6) scale(0.95)">
+        <use href="#nailOverlay"/>
+      </g>
+      <circle cx="110" cy="18" r="12" fill="#1A2338" fill-opacity="0.85"/>
+      <use href="#heartFilled" x="102" y="11" fill="#FFB3CF"/>
+      <text x="10" y="140" font-size="11.5" font-weight="700" fill="#E8ECF5">Sky Ombre</text>
+      <text x="10" y="154" font-size="10" fill="#A9B3C8">Ombre</text>
+    </g>
+
+    <!-- Left Column Card 2 -->
+    <g transform="translate(24, 434)">
+      <rect x="0" y="0" width="130" height="112" rx="18" fill="#1A2338"/>
+      <rect x="0" y="0" width="130" height="74" rx="18" fill="url(#gradMilkyDark)"/>
+      <g transform="translate(-5, -14) scale(0.88)">
+        <use href="#nailOverlay"/>
+      </g>
+      <circle cx="110" cy="18" r="12" fill="#1A2338" fill-opacity="0.85"/>
+      <use href="#heartFilled" x="102" y="11" fill="#A9B3C8" fill-opacity="0.55"/>
+      <text x="10" y="92" font-size="11.5" font-weight="700" fill="#E8ECF5">Milky Nude</text>
+      <text x="10" y="105" font-size="10" fill="#A9B3C8">Minimal</text>
+    </g>
+
+    <!-- Right Column Card 2 -->
+    <g transform="translate(166, 464)">
+      <rect x="0" y="0" width="130" height="82" rx="18" fill="#1A2338"/>
+      <rect x="0" y="0" width="130" height="54" rx="18" fill="url(#gradFloralDark)"/>
+      <text x="10" y="70" font-size="11.5" font-weight="700" fill="#E8ECF5">Rose Gold Sparkle</text>
+    </g>
+
+    <!-- Bottom Navigation Bar (Dark) -->
+    <rect x="8" y="548" width="304" height="64" rx="24" fill="#1A2338"/>
+    <line x1="8" y1="548" x2="312" y2="548" stroke="#2E3953" stroke-width="1"/>
+    <!-- Home (Selected) -->
+    <rect x="26" y="556" width="48" height="24" rx="12" fill="#24476A"/>
+    <path d="M50,561 L42,568 V575 H47 V570 H53 V575 H58 V568 Z" fill="#D6EEFF"/>
+    <text x="50" y="596" text-anchor="middle" font-size="10" font-weight="700" fill="#E8ECF5">Home</text>
+    <!-- Explore -->
+    <circle cx="123" cy="568" r="7" stroke="#A9B3C8" stroke-width="1.6" fill="none"/>
+    <polygon points="121,570 123,564 125,568 123,572" fill="#A9B3C8"/>
+    <text x="123" y="596" text-anchor="middle" font-size="10" fill="#A9B3C8">Explore</text>
+    <!-- Saved -->
+    <use href="#heartFilled" x="189" y="561" fill="#A9B3C8" fill-opacity="0.6"/>
+    <text x="197" y="596" text-anchor="middle" font-size="10" fill="#A9B3C8">Saved</text>
+    <!-- Profile -->
+    <circle cx="270" cy="565" r="4" stroke="#A9B3C8" stroke-width="1.6" fill="none"/>
+    <path d="M263,575 C263,571 277,571 277,575" stroke="#A9B3C8" stroke-width="1.6" fill="none"/>
+    <text x="270" y="596" text-anchor="middle" font-size="10" fill="#A9B3C8">Profile</text>
+
+    <text x="160" y="644" text-anchor="middle" font-size="13" font-weight="700" fill="#1E2A4A">2. Home Screen (Dark Mode)</text>
+  </g>
+
+  <!-- ========================================================= -->
+  <!-- PHONE 3: PROFILE & APPEARANCE + SPLASH PREVIEW            -->
+  <!-- ========================================================= -->
+  <g transform="translate(795, 92)">
+    <!-- Phone Frame -->
+    <rect x="0" y="0" width="320" height="620" rx="36" fill="#0A0F1B" filter="url(#phoneShadow)"/>
+    <rect x="8" y="8" width="304" height="604" rx="30" fill="#0F1626"/>
+
+    <!-- Status Bar -->
+    <text x="28" y="28" font-size="11" font-weight="600" fill="#E8ECF5">9:41</text>
+    <circle cx="160" cy="22" r="4" fill="#E8ECF5" fill-opacity="0.2"/>
+    <rect x="268" y="19" width="18" height="9" rx="2" stroke="#E8ECF5" stroke-width="1.2" fill="none"/>
+    <rect x="270" y="21" width="12" height="5" rx="1" fill="#E8ECF5"/>
+
+    <!-- Top App Bar -->
+    <text x="24" y="64" font-size="20" font-weight="700" fill="#E8ECF5">Profile</text>
+
+    <!-- Avatar + User Info -->
+    <g transform="translate(24, 88)">
+      <circle cx="32" cy="32" r="32" fill="url(#gradSkyOmbre)"/>
+      <circle cx="32" cy="24" r="10" fill="#FFFFFF"/>
+      <path d="M16,48 C16,37 48,37 48,48" fill="#FFFFFF"/>
+      <text x="80" y="28" font-size="18" font-weight="700" fill="#E8ECF5">Nail Lover</text>
+      <text x="80" y="47" font-size="12.5" fill="#A9B3C8">2 saved designs</text>
+    </g>
+
+    <!-- Appearance Setting Card (DataStore Preferences) -->
+    <g transform="translate(24, 172)">
+      <rect x="0" y="0" width="272" height="126" rx="20" fill="#1A2338"/>
+      <circle cx="24" cy="26" r="8" fill="#8FD3FF"/>
+      <text x="42" y="31" font-size="15" font-weight="600" fill="#E8ECF5">Appearance</text>
+      <text x="16" y="52" font-size="11.5" fill="#A9B3C8">Choose how NailSky looks on this device.</text>
+
+      <!-- SingleChoiceSegmentedButtonRow: System | Light | Dark -->
+      <g transform="translate(16, 70)">
+        <rect x="0" y="0" width="240" height="36" rx="18" fill="#0F1626" stroke="#3A4662" stroke-width="1.2"/>
+        <!-- Segment 1: System -->
+        <text x="40" y="22" text-anchor="middle" font-size="12" font-weight="600" fill="#A9B3C8">System</text>
+        <line x1="80" y1="0" x2="80" y2="36" stroke="#3A4662" stroke-width="1.2"/>
+        <!-- Segment 2: Light -->
+        <text x="120" y="22" text-anchor="middle" font-size="12" font-weight="600" fill="#A9B3C8">Light</text>
+        <line x1="160" y1="0" x2="160" y2="36" stroke="#3A4662" stroke-width="1.2"/>
+        <!-- Segment 3: Dark (Selected) -->
+        <path d="M160,0 H222 A18,18 0 0,1 240,18 A18,18 0 0,1 222,36 H160 Z" fill="#24476A"/>
+        <text x="200" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#D6EEFF">✓ Dark</text>
+      </g>
+    </g>
+
+    <!-- Brand & Adaptive Logo Inset Card -->
+    <g transform="translate(24, 316)">
+      <rect x="0" y="0" width="272" height="212" rx="20" fill="#1A2338"/>
+      <text x="16" y="28" font-size="13" font-weight="700" fill="#E8ECF5">Brand &amp; Splash Logo Preview</text>
+      <text x="16" y="45" font-size="10.5" fill="#A9B3C8">Vector bottle + sky-blue crescent cap + star</text>
+      <g transform="translate(82, 62) scale(1.0)">
+        <use href="#nailskyLogo"/>
+      </g>
+      <text x="136" y="194" text-anchor="middle" font-size="10.5" fill="#8FD3FF">res/drawable/nailsky_logo.xml</text>
+    </g>
+
+    <!-- Bottom Navigation Bar (Profile Selected) -->
+    <rect x="8" y="548" width="304" height="64" rx="24" fill="#1A2338"/>
+    <line x1="8" y1="548" x2="312" y2="548" stroke="#2E3953" stroke-width="1"/>
+    <!-- Home -->
+    <path d="M50,561 L42,568 V575 H47 V570 H53 V575 H58 V568 Z" fill="#A9B3C8"/>
+    <text x="50" y="596" text-anchor="middle" font-size="10" fill="#A9B3C8">Home</text>
+    <!-- Explore -->
+    <circle cx="123" cy="568" r="7" stroke="#A9B3C8" stroke-width="1.6" fill="none"/>
+    <polygon points="121,570 123,564 125,568 123,572" fill="#A9B3C8"/>
+    <text x="123" y="596" text-anchor="middle" font-size="10" fill="#A9B3C8">Explore</text>
+    <!-- Saved -->
+    <use href="#heartFilled" x="189" y="561" fill="#A9B3C8" fill-opacity="0.6"/>
+    <text x="197" y="596" text-anchor="middle" font-size="10" fill="#A9B3C8">Saved</text>
+    <!-- Profile (Selected) -->
+    <rect x="246" y="556" width="48" height="24" rx="12" fill="#24476A"/>
+    <circle cx="270" cy="565" r="4" fill="#D6EEFF"/>
+    <path d="M263,575 C263,570 277,570 277,575" fill="#D6EEFF"/>
+    <text x="270" y="596" text-anchor="middle" font-size="10" font-weight="700" fill="#E8ECF5">Profile</text>
+
+    <text x="160" y="644" text-anchor="middle" font-size="13" font-weight="700" fill="#1E2A4A">3. Profile &amp; Logo (Dark Mode)</text>
+  </g>
+</svg>
