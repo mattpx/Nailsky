@@ -36,40 +36,46 @@ class MainActivity : ComponentActivity() {
         setContent {
             val storedMode by themePreferences.themeMode
                 .collectAsStateWithLifecycle(initialValue = null)
+            val displayName by themePreferences.displayName
+                .collectAsStateWithLifecycle(initialValue = "Nail Lover")
             val scope = rememberCoroutineScope()
             val mode = storedMode
             if (mode != null) {
-            SideEffect { themeLoaded = true }
+                SideEffect { themeLoaded = true }
 
-            val darkTheme = when (mode) {
-                ThemeMode.SYSTEM -> isSystemInDarkTheme()
-                ThemeMode.LIGHT -> false
-                ThemeMode.DARK -> true
-            }
+                val darkTheme = when (mode) {
+                    ThemeMode.SYSTEM -> isSystemInDarkTheme()
+                    ThemeMode.LIGHT -> false
+                    ThemeMode.DARK -> true
+                }
 
-            // Keep system bar icon colors in sync with the in-app theme choice.
-            DisposableEffect(darkTheme) {
-                enableEdgeToEdge(
-                    statusBarStyle = SystemBarStyle.auto(
-                        Color.TRANSPARENT,
-                        Color.TRANSPARENT,
-                    ) { darkTheme },
-                    navigationBarStyle = SystemBarStyle.auto(
-                        LightScrim,
-                        DarkScrim,
-                    ) { darkTheme },
-                )
-                onDispose {}
-            }
+                // Keep system bar icon colors in sync with the in-app theme choice.
+                DisposableEffect(darkTheme) {
+                    enableEdgeToEdge(
+                        statusBarStyle = SystemBarStyle.auto(
+                            Color.TRANSPARENT,
+                            Color.TRANSPARENT,
+                        ) { darkTheme },
+                        navigationBarStyle = SystemBarStyle.auto(
+                            LightScrim,
+                            DarkScrim,
+                        ) { darkTheme },
+                    )
+                    onDispose {}
+                }
 
-            NailSkyTheme(darkTheme = darkTheme) {
-                NailSkyApp(
-                    themeMode = mode,
-                    onThemeModeChange = { newMode ->
-                        scope.launch { themePreferences.setThemeMode(newMode) }
-                    },
-                )
-            }
+                NailSkyTheme(darkTheme = darkTheme) {
+                    NailSkyApp(
+                        themeMode = mode,
+                        onThemeModeChange = { newMode ->
+                            scope.launch { themePreferences.setThemeMode(newMode) }
+                        },
+                        displayName = displayName,
+                        onDisplayNameChange = { newName ->
+                            scope.launch { themePreferences.setDisplayName(newName) }
+                        },
+                    )
+                }
             }
         }
     }

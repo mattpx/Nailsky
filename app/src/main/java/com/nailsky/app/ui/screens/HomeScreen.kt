@@ -42,6 +42,8 @@ private val ScreenPadding = 16.dp
 fun HomeScreen(
     savedIds: List<Int>,
     onToggleSave: (Int) -> Unit,
+    onDesignClick: (Int) -> Unit,
+    onSearchClick: () -> Unit,
     modifier: Modifier = Modifier,
     designs: List<NailDesign> = sampleDesigns,
 ) {
@@ -56,7 +58,7 @@ fun HomeScreen(
     }
 
     Column(modifier.fillMaxSize()) {
-        NailSkyTopBar(onSearchClick = { /* Search arrives in a later phase */ })
+        NailSkyTopBar(onSearchClick = onSearchClick)
 
         LazyVerticalStaggeredGrid(
             columns = StaggeredGridCells.Fixed(2),
@@ -92,6 +94,7 @@ fun HomeScreen(
                                 design = design,
                                 isSaved = design.id in savedIds,
                                 onToggleSave = { onToggleSave(design.id) },
+                                onClick = { onDesignClick(design.id) },
                             )
                         }
                     }
@@ -110,6 +113,8 @@ fun HomeScreen(
                     design = design,
                     isSaved = design.id in savedIds,
                     onToggleSave = { onToggleSave(design.id) },
+                    onClick = { onDesignClick(design.id) },
+                    modifier = Modifier.animateItem(),
                 )
             }
         }
@@ -149,7 +154,12 @@ internal fun SectionHeader(
 private fun HomeScreenPreview() {
     NailSkyTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            HomeScreen(savedIds = listOf(2, 5), onToggleSave = {})
+            HomeScreen(
+                savedIds = listOf(2, 5),
+                onToggleSave = {},
+                onDesignClick = {},
+                onSearchClick = {},
+            )
         }
     }
 }

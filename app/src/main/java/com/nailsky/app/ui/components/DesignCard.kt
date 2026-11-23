@@ -1,11 +1,17 @@
 package com.nailsky.app.ui.components
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,40 +32,56 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.nailsky.app.data.NailDesign
 import com.nailsky.app.data.sampleDesigns
 import com.nailsky.app.ui.theme.LocalNailSkyDarkTheme
 import com.nailsky.app.ui.theme.NailSkyTheme
 import com.nailsky.app.ui.theme.ThemePreviews
 import com.nailsky.app.ui.theme.deepen
+import kotlinx.coroutines.delay
 
 private val CardShape = RoundedCornerShape(20.dp)
 
-/** Card for the "Inspiration" staggered grid. */
+/** Card for the staggered inspiration, explore, and saved grids. */
 @Composable
 fun DesignCard(
     design: NailDesign,
     isSaved: Boolean,
     onToggleSave: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
+        onClick = onClick,
         modifier = modifier,
         shape = CardShape,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
-        GradientTile(
+        DesignArtwork(
             design = design,
             modifier = Modifier
                 .fillMaxWidth()
@@ -81,11 +103,37 @@ fun DesignCard(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(
-                text = design.category.label,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Spacer(Modifier.height(2.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = "${design.category.label} · ${design.shape.label}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
+                Spacer(Modifier.width(6.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy((-3).dp)) {
+                    design.colors.take(3).forEach { swatch ->
+                        Box(
+                            modifier = Modifier
+                                .size(10.dp)
+                                .clip(CircleShape)
+                                .background(swatch)
+                                .border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.surface,
+                                    shape = CircleShape,
+                                ),
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -96,18 +144,20 @@ fun TrendingCard(
     design: NailDesign,
     isSaved: Boolean,
     onToggleSave: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
+        onClick = onClick,
         modifier = modifier.width(220.dp),
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
-        GradientTile(
+        DesignArtwork(
             design = design,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(150.dp),
+                .height(154.dp),
         ) {
             SaveToggle(
                 isSaved = isSaved,
@@ -122,10 +172,10 @@ fun TrendingCard(
                     .fillMaxWidth()
                     .background(
                         Brush.verticalGradient(
-                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.38f)),
+                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.62f)),
                         ),
                     )
-                    .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 12.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 28.dp, bottom = 12.dp),
             ) {
                 Text(
                     text = design.title,
@@ -135,9 +185,11 @@ fun TrendingCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = design.category.label,
+                    text = "${design.category.label} · ${design.artist}",
                     style = MaterialTheme.typography.labelMedium,
                     color = Color.White.copy(alpha = 0.85f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
@@ -145,7 +197,39 @@ fun TrendingCard(
 }
 
 /**
- * Placeholder artwork: a soft gradient with stylised nail shapes. Uses deeper tones in dark mode.
+ * Loads the real nail photo via Coil over [GradientTile] so cards always show graceful NailSky
+ * gradient artwork while loading, in offline mode, or inside Compose Previews.
+ */
+@Composable
+fun DesignArtwork(
+    design: NailDesign,
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit = {},
+) {
+    val isPreview = LocalInspectionMode.current
+    val context = LocalContext.current
+
+    GradientTile(design = design, modifier = modifier) {
+        if (!isPreview && design.imageUrl.isNotBlank()) {
+            val request = remember(design.imageUrl) {
+                ImageRequest.Builder(context)
+                    .data(design.imageUrl)
+                    .crossfade(300)
+                    .build()
+            }
+            AsyncImage(
+                model = request,
+                contentDescription = design.title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
+        content()
+    }
+}
+
+/**
+ * Fallback & placeholder artwork: a soft gradient with stylised nail shapes. Uses deeper tones in dark mode.
  */
 @Composable
 fun GradientTile(
@@ -196,21 +280,45 @@ fun SaveToggle(
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val haptics = LocalHapticFeedback.current
+    var pulsing by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (pulsing) 1.25f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium,
+        ),
+        label = "heart_scale",
+    )
+
+    LaunchedEffect(pulsing) {
+        if (pulsing) {
+            delay(140)
+            pulsing = false
+        }
+    }
+
     Surface(
         modifier = modifier,
         shape = CircleShape,
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.88f),
     ) {
         IconToggleButton(
             checked = isSaved,
-            onCheckedChange = { onToggle() },
+            onCheckedChange = {
+                pulsing = true
+                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onToggle()
+            },
             modifier = Modifier.size(36.dp),
         ) {
             Icon(
                 imageVector = if (isSaved) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                 contentDescription = if (isSaved) "Remove from saved" else "Save design",
                 tint = if (isSaved) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier
+                    .size(20.dp)
+                    .scale(scale),
             )
         }
     }
@@ -225,6 +333,7 @@ private fun DesignCardPreview() {
                 design = sampleDesigns[1],
                 isSaved = true,
                 onToggleSave = {},
+                onClick = {},
                 modifier = Modifier.width(170.dp),
             )
         }
@@ -236,7 +345,12 @@ private fun DesignCardPreview() {
 private fun TrendingCardPreview() {
     NailSkyTheme {
         Box(Modifier.padding(16.dp)) {
-            TrendingCard(design = sampleDesigns[4], isSaved = false, onToggleSave = {})
+            TrendingCard(
+                design = sampleDesigns[4],
+                isSaved = false,
+                onToggleSave = {},
+                onClick = {},
+            )
         }
     }
 }
