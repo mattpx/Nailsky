@@ -2,8 +2,8 @@ package com.nailsky.app.ui.screens
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,11 +31,13 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.BookmarkAdd
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -50,7 +52,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,6 +65,8 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.nailsky.app.data.BoardWithDesigns
 import com.nailsky.app.data.NailDesign
 import com.nailsky.app.data.relatedDesigns
@@ -73,6 +76,8 @@ import com.nailsky.app.ui.components.AddToBoardSheet
 import com.nailsky.app.ui.components.CreateBoardDialog
 import com.nailsky.app.ui.components.DesignArtwork
 import com.nailsky.app.ui.components.DesignCard
+import com.nailsky.app.ui.components.LacquerDroplet
+import com.nailsky.app.ui.components.NailShapeIcon
 import com.nailsky.app.ui.components.SaveToggle
 import com.nailsky.app.ui.theme.NailSkyTheme
 import com.nailsky.app.ui.theme.ThemePreviews
@@ -89,6 +94,7 @@ fun DesignDetailScreen(
     onSaveNote: (String) -> Unit,
     onToggleBoard: (BoardWithDesigns, Boolean) -> Unit,
     onCreateBoard: (name: String, emoji: String) -> Unit,
+    onTryInStudio: (NailDesign) -> Unit,
     onTagClick: (String) -> Unit,
     onDesignClick: (Int) -> Unit,
     onShowMessage: (String) -> Unit,
@@ -100,6 +106,7 @@ fun DesignDetailScreen(
 
     var showBoardSheet by remember { mutableStateOf(false) }
     var showCreateBoard by remember { mutableStateOf(false) }
+    var showNailTechCard by remember { mutableStateOf(false) }
     var noteDraft by remember(design.id, savedNote) { mutableStateOf(savedNote) }
 
     val related = remember(design, allDesigns) { relatedDesigns(design, allDesigns) }
@@ -136,25 +143,24 @@ fun DesignDetailScreen(
             .verticalScroll(rememberScrollState())
             .navigationBarsPadding(),
     ) {
-        // Hero artwork header with floating back/share/save actions
+        // Edge-to-edge macro hero header
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(380.dp)
-                .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)),
+                .height(400.dp)
+                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)),
         ) {
             DesignArtwork(
                 design = design,
                 modifier = Modifier.fillMaxSize(),
             ) {
-                // Top scrim for legibility
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(104.dp)
+                        .height(110.dp)
                         .background(
                             Brush.verticalGradient(
-                                listOf(Color.Black.copy(alpha = 0.35f), Color.Transparent),
+                                listOf(Color.Black.copy(alpha = 0.36f), Color.Transparent),
                             ),
                         ),
                 )
@@ -196,47 +202,31 @@ fun DesignDetailScreen(
                     }
                 }
 
-                // Bottom category + trending badges
-                Row(
+                // Floating Try in Studio pill at bottom-right of hero
+                Surface(
+                    onClick = { onTryInStudio(design) },
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
                     modifier = Modifier
-                        .align(Alignment.BottomStart)
+                        .align(Alignment.BottomEnd)
                         .padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Surface(
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                    Row(
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
-                        Text(
-                            text = design.category.label,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        Icon(
+                            imageVector = Icons.Rounded.AutoAwesome,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier.size(16.dp),
                         )
-                    }
-                    if (design.trending) {
-                        Surface(
-                            shape = CircleShape,
-                            color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.92f),
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.AutoAwesome,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onTertiary,
-                                    modifier = Modifier.size(14.dp),
-                                )
-                                Text(
-                                    text = "Trending",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onTertiary,
-                                )
-                            }
-                        }
+                        Text(
+                            text = "Try in Studio",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
                     }
                 }
             }
@@ -255,12 +245,12 @@ fun DesignDetailScreen(
                 Column(Modifier.weight(1f)) {
                     Text(
                         text = design.title,
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onBackground,
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "by ${design.artist}",
+                        text = "${design.category.label} · by ${design.artist}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -289,46 +279,39 @@ fun DesignDetailScreen(
                 }
             }
 
-            // Spec pills: Shape, Finish, Difficulty, Est. time
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+            // Signature 1-tap "Show My Nail Tech" Primary CTA
+            Button(
+                onClick = { showNailTechCard = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(18.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
             ) {
-                SpecPill(label = design.shape.label)
-                SpecPill(label = design.finish.label)
-                SpecPill(label = design.difficulty.label)
-                SpecPill(
-                    label = "${design.durationMinutes} min",
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Rounded.Schedule,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    },
-                )
+                Icon(Icons.Rounded.Spa, contentDescription = null, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Show My Nail Tech", style = MaterialTheme.typography.titleSmall)
             }
 
-            // Primary actions: Save + Add to Board
+            // Secondary actions: Save + Add to Board
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Button(
+                FilledTonalButton(
                     onClick = { onToggleSave(design.id) },
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(14.dp),
                     colors = if (isSaved) {
-                        ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.tertiary,
-                            contentColor = MaterialTheme.colorScheme.onTertiary,
+                        ButtonDefaults.filledTonalButtonColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                         )
                     } else {
-                        ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary,
-                        )
+                        ButtonDefaults.filledTonalButtonColors()
                     },
                 ) {
                     Icon(
@@ -355,7 +338,61 @@ fun DesignDetailScreen(
                 }
             }
 
-            // Description
+            // Visual specs bar with real nail silhouette
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 1.dp,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        NailShapeIcon(shape = design.shape, selected = true, size = 30.dp)
+                        Column {
+                            Text(
+                                text = "${design.shape.label} · ${design.finish.label}",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = design.difficulty.label,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                    Surface(
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Schedule,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Text(
+                                text = "${design.durationMinutes} min",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+            }
+
             if (design.description.isNotBlank()) {
                 Text(
                     text = design.description,
@@ -364,11 +401,11 @@ fun DesignDetailScreen(
                 )
             }
 
-            // Color Palette swatches (tap to copy hex)
+            // Glossy 3D Polish Formula Droplets (tap to copy hex)
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
-                    text = "Color Palette",
-                    style = MaterialTheme.typography.titleMedium,
+                    text = "Polish Formula",
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onBackground,
                 )
                 Row(
@@ -378,12 +415,12 @@ fun DesignDetailScreen(
                     design.colors.forEach { swatch ->
                         val hex = remember(swatch) { swatch.toHexString() }
                         Surface(
-                            shape = RoundedCornerShape(14.dp),
+                            shape = RoundedCornerShape(18.dp),
                             color = MaterialTheme.colorScheme.surface,
                             tonalElevation = 1.dp,
                             modifier = Modifier
                                 .weight(1f)
-                                .clip(RoundedCornerShape(14.dp))
+                                .clip(RoundedCornerShape(18.dp))
                                 .clickable {
                                     clipboard.setText(AnnotatedString(hex))
                                     onShowMessage("Copied $hex")
@@ -394,17 +431,7 @@ fun DesignDetailScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.spacedBy(6.dp),
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(34.dp)
-                                        .clip(CircleShape)
-                                        .background(swatch)
-                                        .border(
-                                            width = 1.dp,
-                                            color = MaterialTheme.colorScheme.outlineVariant,
-                                            shape = CircleShape,
-                                        ),
-                                )
+                                LacquerDroplet(color = swatch, size = 38.dp)
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(3.dp),
@@ -446,7 +473,7 @@ fun DesignDetailScreen(
             // Salon Request & How-To Steps
             if (design.steps.isNotEmpty()) {
                 Card(
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(22.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -492,7 +519,7 @@ fun DesignDetailScreen(
 
             // Personal Salon Note (persisted in Room)
             Card(
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(22.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -520,7 +547,7 @@ fun DesignDetailScreen(
                         FilledTonalButton(
                             onClick = {
                                 onSaveNote(noteDraft)
-                                onShowMessage("Note saved")
+                                onShowMessage("Salon note saved")
                             },
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.align(Alignment.End),
@@ -533,7 +560,6 @@ fun DesignDetailScreen(
                 }
             }
 
-            // Related Designs
             if (related.isNotEmpty()) {
                 Text(
                     text = "More Like This",
@@ -545,7 +571,7 @@ fun DesignDetailScreen(
 
         if (related.isNotEmpty()) {
             LazyRow(
-                contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 24.dp),
+                contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 28.dp),
                 horizontalArrangement = Arrangement.spacedBy(14.dp),
             ) {
                 items(related, key = { it.id }) { relatedDesign ->
@@ -559,6 +585,14 @@ fun DesignDetailScreen(
                 }
             }
         }
+    }
+
+    if (showNailTechCard) {
+        ShowNailTechDialog(
+            design = design,
+            note = noteDraft.trim(),
+            onDismiss = { showNailTechCard = false },
+        )
     }
 
     if (showBoardSheet) {
@@ -589,6 +623,155 @@ fun DesignDetailScreen(
     }
 }
 
+/**
+ * Full-screen uncluttered salon reference brief designed to hand straight to your nail technician.
+ */
+@Composable
+private fun ShowNailTechDialog(
+    design: NailDesign,
+    note: String,
+    onDismiss: () -> Unit,
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background,
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
+                    .verticalScroll(rememberScrollState())
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(18.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column {
+                        Text(
+                            text = "Salon Brief",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onBackground,
+                        )
+                        Text(
+                            text = "Show this screen to your nail tech",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Surface(
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.surface,
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                    ) {
+                        IconButton(onClick = onDismiss) {
+                            Icon(Icons.Rounded.Close, contentDescription = "Close salon brief")
+                        }
+                    }
+                }
+
+                // Large crisp photo
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(270.dp)
+                        .clip(RoundedCornerShape(26.dp)),
+                ) {
+                    DesignArtwork(design = design, modifier = Modifier.fillMaxSize())
+                }
+
+                // Shape & Finish callout card
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 1.dp,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        NailShapeIcon(shape = design.shape, selected = true, size = 38.dp)
+                        Column {
+                            Text(
+                                text = design.title,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = "${design.shape.label} Shape · ${design.finish.label} Finish · ~${design.durationMinutes} min",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+
+                // Glossy Polish Formula droplets
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                ) {
+                    design.colors.forEach { swatch ->
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            LacquerDroplet(color = swatch, size = 46.dp)
+                            Text(
+                                text = swatch.toHexString(),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onBackground,
+                            )
+                        }
+                    }
+                }
+
+                // Personal Note or Steps
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            text = if (note.isNotBlank()) "Client Note" else "Technique Summary",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onBackground,
+                        )
+                        if (note.isNotBlank()) {
+                            Text(
+                                text = note,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onBackground,
+                            )
+                        } else {
+                            design.steps.forEachIndexed { idx, step ->
+                                Text(
+                                    text = "${idx + 1}. $step",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun FloatingIconButton(
     onClick: () -> Unit,
@@ -603,30 +786,6 @@ private fun FloatingIconButton(
             modifier = Modifier.size(36.dp),
         ) {
             icon()
-        }
-    }
-}
-
-@Composable
-private fun SpecPill(
-    label: String,
-    leadingIcon: (@Composable () -> Unit)? = null,
-) {
-    Surface(
-        shape = CircleShape,
-        color = MaterialTheme.colorScheme.surfaceVariant,
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            leadingIcon?.invoke()
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
         }
     }
 }
@@ -647,6 +806,7 @@ private fun DesignDetailScreenPreview() {
                 onSaveNote = {},
                 onToggleBoard = { _, _ -> },
                 onCreateBoard = { _, _ -> },
+                onTryInStudio = {},
                 onTagClick = {},
                 onDesignClick = {},
                 onShowMessage = {},

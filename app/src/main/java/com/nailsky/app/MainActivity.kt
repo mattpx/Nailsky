@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nailsky.app.data.NailPassportState
 import com.nailsky.app.data.ThemeMode
 import com.nailsky.app.data.ThemePreferences
 import com.nailsky.app.ui.navigation.NailSkyApp
@@ -38,6 +39,8 @@ class MainActivity : ComponentActivity() {
                 .collectAsStateWithLifecycle(initialValue = null)
             val displayName by themePreferences.displayName
                 .collectAsStateWithLifecycle(initialValue = "Nail Lover")
+            val passport by themePreferences.nailPassport
+                .collectAsStateWithLifecycle(initialValue = NailPassportState())
             val scope = rememberCoroutineScope()
             val mode = storedMode
             if (mode != null) {
@@ -74,6 +77,13 @@ class MainActivity : ComponentActivity() {
                         onDisplayNameChange = { newName ->
                             scope.launch { themePreferences.setDisplayName(newName) }
                         },
+                        passport = passport,
+                        onLogNewManicure = { title, days ->
+                            scope.launch { themePreferences.logNewManicure(title, days) }
+                        },
+                        onCheckInCuticle = {
+                            scope.launch { themePreferences.checkInCuticleCare() }
+                        },
                     )
                 }
             }
@@ -82,6 +92,6 @@ class MainActivity : ComponentActivity() {
 
     private companion object {
         val LightScrim = Color.argb(0xE6, 0xFF, 0xFF, 0xFF)
-        val DarkScrim = Color.argb(0x80, 0x0F, 0x16, 0x26)
+        val DarkScrim = Color.argb(0x80, 0x0C, 0x10, 0x1B)
     }
 }

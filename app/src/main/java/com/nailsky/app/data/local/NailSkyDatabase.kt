@@ -11,8 +11,9 @@ import androidx.room.RoomDatabase
         BoardEntity::class,
         BoardDesignCrossRef::class,
         RecentViewEntity::class,
+        CustomSetEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class NailSkyDatabase : RoomDatabase() {

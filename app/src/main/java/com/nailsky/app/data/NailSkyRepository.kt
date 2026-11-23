@@ -3,6 +3,7 @@ package com.nailsky.app.data
 import androidx.compose.runtime.Immutable
 import com.nailsky.app.data.local.BoardDesignCrossRef
 import com.nailsky.app.data.local.BoardEntity
+import com.nailsky.app.data.local.CustomSetEntity
 import com.nailsky.app.data.local.NailSkyDao
 import com.nailsky.app.data.local.RecentViewEntity
 import com.nailsky.app.data.local.SavedDesignEntity
@@ -42,6 +43,21 @@ class NailSkyRepository(private val dao: NailSkyDao) {
     }
 
     val recentViewIds: Flow<List<Int>> = dao.observeRecentViewIds()
+
+    val customSets: Flow<List<CustomNailSet>> = dao.observeCustomSets().map { entities ->
+        entities.map { entity ->
+            CustomNailSet(
+                id = entity.id,
+                name = entity.name,
+                shape = NailShape.entries.firstOrNull { it.name == entity.shape } ?: NailShape.ALMOND,
+                lengthFactor = entity.lengthFactor.coerceIn(0f, 1f),
+                effect = StudioEffect.entries.firstOrNull { it.name == entity.effect } ?: StudioEffect.GLOSSY,
+                skinToneIndex = entity.skinToneIndex,
+                nailColors = decodeColorCsv(entity.nailColorsCsv),
+                createdAt = entity.createdAt,
+            )
+        }
+    }
 
     suspend fun toggleSave(designId: Int): Boolean {
         return if (dao.isSaved(designId)) {
@@ -117,5 +133,23 @@ class NailSkyRepository(private val dao: NailSkyDao) {
 
     suspend fun clearRecentViews() {
         dao.clearRecentViews()
+    }
+
+    suspend fun saveCustomSet(set: CustomNailSet): Long {
+        return dao.insertCustomSet(
+            CustomSetEntity(
+                name = set.name.trim().ifBlank { "My Studio Set" },
+                shape = set.shape.name,
+                lengthFactor = set.lengthFactor,
+                effect = set.effect.name,
+                skinToneIndex = set.skinToneIndex,
+                nailColorsCsv = set.nailColors.encodeColorCsv(),
+                createdAt = System.currentTimeMillis(),
+            ),
+        )
+    }
+
+    suspend fun deleteCustomSet(setId: Long) {
+        dao.deleteCustomSet(setId)
     }
 }

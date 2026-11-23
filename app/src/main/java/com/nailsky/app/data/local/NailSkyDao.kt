@@ -56,4 +56,13 @@ interface NailSkyDao {
 
     @Query("DELETE FROM recent_views")
     suspend fun clearRecentViews()
+
+    @Query("SELECT * FROM custom_sets ORDER BY createdAt DESC")
+    fun observeCustomSets(): Flow<List<CustomSetEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCustomSet(entity: CustomSetEntity): Long
+
+    @Query("DELETE FROM custom_sets WHERE id = :setId")
+    suspend fun deleteCustomSet(setId: Long)
 }

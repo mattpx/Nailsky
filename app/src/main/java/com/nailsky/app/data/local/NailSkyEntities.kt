@@ -47,3 +47,15 @@ data class RecentViewEntity(
     @PrimaryKey val designId: Int,
     val viewedAt: Long,
 )
+
+@Entity(tableName = "custom_sets")
+data class CustomSetEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val name: String,
+    val shape: String,
+    val lengthFactor: Float,
+    val effect: String,
+    val skinToneIndex: Int,
+    val nailColorsCsv: String,
+    val createdAt: Long,
+)

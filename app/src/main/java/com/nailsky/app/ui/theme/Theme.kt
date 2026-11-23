@@ -24,31 +24,31 @@ private val LightColors = lightColorScheme(
     onTertiary = CloudWhite,
     background = SkyMist,
     onBackground = DeepNavy,
-    surface = CloudWhite,
+    surface = PearlSurface,
     onSurface = DeepNavy,
-    surfaceVariant = Color(0xFFEDF2F8),
+    surfaceVariant = Color(0xFFF0EEF5),
     onSurfaceVariant = SlateText,
     surfaceTint = SkyBlue,
     outline = SoftOutline,
-    outlineVariant = Color(0xFFE2E8F0),
+    outlineVariant = Color(0xFFE7E4EE),
     surfaceContainerLowest = CloudWhite,
-    surfaceContainerLow = Color(0xFFFBFCFE),
-    surfaceContainer = CloudWhite,
-    surfaceContainerHigh = Color(0xFFF2F6FA),
-    surfaceContainerHighest = Color(0xFFEDF2F8),
+    surfaceContainerLow = Color(0xFFFCFAFD),
+    surfaceContainer = PearlSurface,
+    surfaceContainerHigh = Color(0xFFF3F1F8),
+    surfaceContainerHighest = Color(0xFFECE9F3),
 )
 
 private val DarkColors = darkColorScheme(
     primary = NightPrimary,
-    onPrimary = Color(0xFF0D2A40),
-    primaryContainer = Color(0xFF24476A),
+    onPrimary = Color(0xFF0A2438),
+    primaryContainer = Color(0xFF1E3E5C),
     onPrimaryContainer = Color(0xFFD6EEFF),
     secondary = NightSecondary,
-    onSecondary = Color(0xFF4A1830),
-    secondaryContainer = Color(0xFF5C2A42),
+    onSecondary = Color(0xFF47152D),
+    secondaryContainer = Color(0xFF53243C),
     onSecondaryContainer = Color(0xFFFFD9E6),
     tertiary = NightSecondary,
-    onTertiary = Color(0xFF4A1830),
+    onTertiary = Color(0xFF47152D),
     background = NightBackground,
     onBackground = NightOnSurface,
     surface = NightSurface,
@@ -57,9 +57,9 @@ private val DarkColors = darkColorScheme(
     onSurfaceVariant = NightOnSurfaceVariant,
     surfaceTint = NightPrimary,
     outline = NightOutline,
-    outlineVariant = Color(0xFF2E3953),
+    outlineVariant = Color(0xFF2A3450),
     surfaceContainerLowest = NightBackground,
-    surfaceContainerLow = Color(0xFF151D30),
+    surfaceContainerLow = Color(0xFF121726),
     surfaceContainer = NightSurface,
     surfaceContainerHigh = NightSurfaceHigh,
     surfaceContainerHighest = NightSurfaceHighest,
@@ -84,11 +84,11 @@ fun NailSkyTheme(
 }
 
 /** Renders a preview in both light and dark mode. */
-@Preview(name = "Light", showBackground = true, backgroundColor = 0xFFF7FAFD)
+@Preview(name = "Light", showBackground = true, backgroundColor = 0xFFF8F6FA)
 @Preview(
     name = "Dark",
     showBackground = true,
-    backgroundColor = 0xFF0F1626,
+    backgroundColor = 0xFF0C101B,
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
 )
 annotation class ThemePreviews

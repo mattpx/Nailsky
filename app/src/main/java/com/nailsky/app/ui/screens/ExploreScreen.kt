@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
@@ -67,6 +68,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nailsky.app.data.Category
+import com.nailsky.app.data.ColorMood
 import com.nailsky.app.data.ExploreFilter
 import com.nailsky.app.data.NailDesign
 import com.nailsky.app.data.NailFinish
@@ -74,8 +76,12 @@ import com.nailsky.app.data.NailShape
 import com.nailsky.app.data.filterDesigns
 import com.nailsky.app.data.sampleDesigns
 import com.nailsky.app.data.trendingTags
+import com.nailsky.app.data.weeklyTopDesigns
+import com.nailsky.app.ui.components.ColorMoodStrip
 import com.nailsky.app.ui.components.DesignArtwork
 import com.nailsky.app.ui.components.DesignCard
+import com.nailsky.app.ui.components.NailShapeStrip
+import com.nailsky.app.ui.components.RankedLookCard
 import com.nailsky.app.ui.components.horizontalBleed
 import com.nailsky.app.ui.theme.NailSkyTheme
 import com.nailsky.app.ui.theme.ThemePreviews
@@ -98,6 +104,7 @@ fun ExploreScreen(
     var selectedShape by rememberSaveable { mutableStateOf<NailShape?>(null) }
     var selectedFinish by rememberSaveable { mutableStateOf<NailFinish?>(null) }
     var selectedArtist by rememberSaveable { mutableStateOf<String?>(null) }
+    var selectedMood by rememberSaveable { mutableStateOf<ColorMood?>(null) }
     var showFilterTray by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(initialQuery) {
@@ -107,21 +114,24 @@ fun ExploreScreen(
             selectedShape = null
             selectedFinish = null
             selectedArtist = null
+            selectedMood = null
             onConsumeInitialQuery()
         }
     }
 
-    val filter = remember(query, selectedCategory, selectedShape, selectedFinish, selectedArtist) {
+    val filter = remember(query, selectedCategory, selectedShape, selectedFinish, selectedArtist, selectedMood) {
         ExploreFilter(
             query = query,
             category = selectedCategory,
             shape = selectedShape,
             finish = selectedFinish,
             artist = selectedArtist,
+            colorMood = selectedMood,
         )
     }
 
     val results = remember(designs, filter) { filterDesigns(designs, filter) }
+    val weeklyTop = remember(designs) { weeklyTopDesigns(designs, limit = 6) }
     val artists = remember(designs) {
         designs.groupBy { it.artist }.entries.sortedByDescending { it.value.size }
     }
@@ -140,12 +150,13 @@ fun ExploreScreen(
         selectedShape = null
         selectedFinish = null
         selectedArtist = null
+        selectedMood = null
     }
 
     val focusManager = LocalFocusManager.current
 
     Column(modifier.fillMaxSize()) {
-        ScreenTopBar(title = "Explore")
+        ScreenTopBar(title = "Discover")
 
         // Search input + filter toggle
         Row(
@@ -160,7 +171,7 @@ fun ExploreScreen(
                 value = query,
                 onValueChange = { query = it },
                 modifier = Modifier.weight(1f),
-                placeholder = { Text("Search styles, colors, tags, artists…") },
+                placeholder = { Text("Search shade, vibe, artist…") },
                 leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
                 trailingIcon = {
                     if (query.isNotEmpty()) {
@@ -219,14 +230,14 @@ fun ExploreScreen(
             }
         }
 
-        // Expandable Shape & Finish filter tray
+        // Expandable Finish & Shape tray
         AnimatedVisibility(visible = showFilterTray) {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = ScreenPadding)
                     .padding(bottom = 12.dp),
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(22.dp),
                 color = MaterialTheme.colorScheme.surface,
                 tonalElevation = 1.dp,
             ) {
@@ -240,7 +251,7 @@ fun ExploreScreen(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = "Filter by shape & finish",
+                            text = "Finish & Shape",
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
@@ -249,33 +260,6 @@ fun ExploreScreen(
                         }
                     }
 
-                    Text(
-                        text = "Nail Shape",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(NailShape.entries, key = { it.name }) { shape ->
-                            FilterChip(
-                                selected = selectedShape == shape,
-                                onClick = {
-                                    selectedShape = if (selectedShape == shape) null else shape
-                                },
-                                label = { Text(shape.label) },
-                                shape = CircleShape,
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                                ),
-                            )
-                        }
-                    }
-
-                    Text(
-                        text = "Finish",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(NailFinish.entries, key = { it.name }) { finish ->
                             FilterChip(
@@ -292,16 +276,21 @@ fun ExploreScreen(
                             )
                         }
                     }
+
+                    NailShapeStrip(
+                        selectedShape = selectedShape,
+                        onSelectShape = { selectedShape = it },
+                        contentPadding = PaddingValues(0.dp),
+                    )
                 }
             }
         }
 
-        // Main scrollable content
         if (filter.isActive && results.isEmpty()) {
             EmptyState(
                 icon = Icons.Rounded.SearchOff,
-                title = "No matching designs",
-                message = "Try a different keyword or clear one of your filters.",
+                title = "No matching looks",
+                message = "Try another shade or clear one of your active filters.",
                 actionLabel = "Clear search & filters",
                 onAction = clearAll,
             )
@@ -313,12 +302,91 @@ fun ExploreScreen(
                     start = ScreenPadding,
                     end = ScreenPadding,
                     top = 4.dp,
-                    bottom = ScreenPadding,
+                    bottom = 112.dp,
                 ),
-                horizontalArrangement = Arrangement.spacedBy(ScreenPadding),
-                verticalItemSpacing = ScreenPadding,
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                verticalItemSpacing = 14.dp,
             ) {
+                // Glossy Shade Palette Bar (always tactile & immediate)
+                item(key = "shade_header", span = StaggeredGridItemSpan.FullLine) {
+                    SectionHeader(
+                        title = "Pick Your Shade",
+                        trailing = selectedMood?.label,
+                    )
+                }
+                item(key = "shade_bar", span = StaggeredGridItemSpan.FullLine) {
+                    ColorMoodStrip(
+                        selectedMood = selectedMood,
+                        onSelectMood = { selectedMood = it },
+                        modifier = Modifier.horizontalBleed(ScreenPadding),
+                    )
+                }
+
                 if (!filter.isActive) {
+                    // Weekly Top Looks (#1, #2, #3...)
+                    item(key = "top_header", span = StaggeredGridItemSpan.FullLine) {
+                        SectionHeader(title = "Weekly Top Looks")
+                    }
+                    item(key = "top_row", span = StaggeredGridItemSpan.FullLine) {
+                        LazyRow(
+                            modifier = Modifier.horizontalBleed(ScreenPadding),
+                            contentPadding = PaddingValues(horizontal = ScreenPadding),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            itemsIndexed(weeklyTop, key = { _, d -> d.id }) { idx, design ->
+                                RankedLookCard(
+                                    rank = idx + 1,
+                                    design = design,
+                                    isSaved = design.id in savedIds,
+                                    onToggleSave = { onToggleSave(design.id) },
+                                    onClick = { onDesignClick(design.id) },
+                                )
+                            }
+                        }
+                    }
+
+                    // Browse by Style
+                    item(key = "styles_header", span = StaggeredGridItemSpan.FullLine) {
+                        SectionHeader(title = "Browse by Style")
+                    }
+                    item(key = "styles_row", span = StaggeredGridItemSpan.FullLine) {
+                        LazyRow(
+                            modifier = Modifier.horizontalBleed(ScreenPadding),
+                            contentPadding = PaddingValues(horizontal = ScreenPadding),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            items(stylePreviews, key = { it.first.name }) { (category, previewDesign, count) ->
+                                StyleCollectionCard(
+                                    category = category,
+                                    previewDesign = previewDesign,
+                                    count = count,
+                                    onClick = { selectedCategory = category },
+                                )
+                            }
+                        }
+                    }
+
+                    // Featured Artists
+                    item(key = "artists_header", span = StaggeredGridItemSpan.FullLine) {
+                        SectionHeader(title = "Featured Nail Artists")
+                    }
+                    item(key = "artists_row", span = StaggeredGridItemSpan.FullLine) {
+                        LazyRow(
+                            modifier = Modifier.horizontalBleed(ScreenPadding),
+                            contentPadding = PaddingValues(horizontal = ScreenPadding),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
+                            items(artists, key = { it.key }) { (artist, artistDesigns) ->
+                                ArtistChipCard(
+                                    artist = artist,
+                                    count = artistDesigns.size,
+                                    onClick = { selectedArtist = artist },
+                                )
+                            }
+                        }
+                    }
+
+                    // Trending Hashtags
                     item(key = "trending_tags", span = StaggeredGridItemSpan.FullLine) {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             SectionHeader(title = "Trending Tags")
@@ -337,51 +405,10 @@ fun ExploreScreen(
                         }
                     }
 
-                    item(key = "styles_header", span = StaggeredGridItemSpan.FullLine) {
-                        SectionHeader(title = "Browse by Style")
-                    }
-
-                    item(key = "styles_row", span = StaggeredGridItemSpan.FullLine) {
-                        LazyRow(
-                            modifier = Modifier.horizontalBleed(ScreenPadding),
-                            contentPadding = PaddingValues(horizontal = ScreenPadding),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            items(stylePreviews, key = { it.first.name }) { (category, previewDesign, count) ->
-                                StyleCollectionCard(
-                                    category = category,
-                                    previewDesign = previewDesign,
-                                    count = count,
-                                    onClick = { selectedCategory = category },
-                                )
-                            }
-                        }
-                    }
-
-                    item(key = "artists_header", span = StaggeredGridItemSpan.FullLine) {
-                        SectionHeader(title = "Featured Artists")
-                    }
-
-                    item(key = "artists_row", span = StaggeredGridItemSpan.FullLine) {
-                        LazyRow(
-                            modifier = Modifier.horizontalBleed(ScreenPadding),
-                            contentPadding = PaddingValues(horizontal = ScreenPadding),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        ) {
-                            items(artists, key = { it.key }) { (artist, artistDesigns) ->
-                                ArtistChipCard(
-                                    artist = artist,
-                                    count = artistDesigns.size,
-                                    onClick = { selectedArtist = artist },
-                                )
-                            }
-                        }
-                    }
-
                     item(key = "discover_header", span = StaggeredGridItemSpan.FullLine) {
                         SectionHeader(
-                            title = "All Designs",
-                            trailing = "${results.size} looks",
+                            title = "All Looks",
+                            trailing = "${results.size} designs",
                         )
                     }
                 } else {
@@ -393,7 +420,7 @@ fun ExploreScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
-                                    text = if (results.size == 1) "1 matching design" else "${results.size} matching designs",
+                                    text = if (results.size == 1) "1 matching look" else "${results.size} matching looks",
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.onBackground,
                                 )
@@ -406,6 +433,12 @@ fun ExploreScreen(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalArrangement = Arrangement.spacedBy(4.dp),
                             ) {
+                                selectedMood?.let { mood ->
+                                    RemovableFilterPill(
+                                        label = mood.label,
+                                        onRemove = { selectedMood = null },
+                                    )
+                                }
                                 if (selectedCategory != Category.ALL) {
                                     RemovableFilterPill(
                                         label = selectedCategory.label,
@@ -458,11 +491,11 @@ private fun StyleCollectionCard(
 ) {
     Card(
         onClick = onClick,
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier
             .width(132.dp)
-            .height(92.dp),
+            .height(94.dp),
     ) {
         DesignArtwork(
             design = previewDesign,
@@ -474,7 +507,7 @@ private fun StyleCollectionCard(
                     .fillMaxWidth()
                     .background(
                         Brush.verticalGradient(
-                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.65f)),
+                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.68f)),
                         ),
                     )
                     .padding(horizontal = 12.dp, vertical = 10.dp),
@@ -504,7 +537,7 @@ private fun ArtistChipCard(
 ) {
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(18.dp),
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = 1.dp,
     ) {
@@ -540,7 +573,7 @@ private fun ArtistChipCard(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    text = "$count designs",
+                    text = "$count looks",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -582,7 +615,7 @@ internal fun ScreenTopBar(
 ) {
     TopAppBar(
         modifier = modifier,
-        title = { Text(title, style = MaterialTheme.typography.titleLarge) },
+        title = { Text(title, style = MaterialTheme.typography.headlineSmall) },
         actions = { actions() },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,

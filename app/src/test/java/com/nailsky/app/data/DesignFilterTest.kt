@@ -1,5 +1,6 @@
 package com.nailsky.app.data
 
+import androidx.compose.ui.graphics.Color
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -42,7 +43,7 @@ class DesignFilterTest {
     }
 
     @Test
-    fun structuredFiltersCombineWithQuery() {
+    fun structuredFiltersAndColorMoodWorkTogether() {
         val filter = ExploreFilter(
             shape = NailShape.ALMOND,
             finish = NailFinish.CHROME,
@@ -51,11 +52,36 @@ class DesignFilterTest {
         assertTrue(result.isNotEmpty())
         assertTrue(result.all { it.shape == NailShape.ALMOND && it.finish == NailFinish.CHROME })
         assertEquals(2, filter.activeFilterCount)
+
+        val blushMatches = filterDesigns(sampleDesigns, ExploreFilter(colorMood = ColorMood.BLUSH))
+        assertTrue(blushMatches.isNotEmpty())
+    }
+
+    @Test
+    fun weeklyTopDesignsReturnsSortedByLikes() {
+        val top = weeklyTopDesigns(sampleDesigns, limit = 5)
+        assertEquals(5, top.size)
+        for (i in 0 until top.lastIndex) {
+            assertTrue(top[i].likesCount >= top[i + 1].likesCount)
+        }
+    }
+
+    @Test
+    fun customSetColorCsvRoundTripsCleanly() {
+        val palette = listOf(
+            Color(0xFFF7B8CF),
+            Color(0xFF8CD3FA),
+            Color(0xFFF9F3EE),
+            Color(0xFFCBB8F7),
+            Color(0xFF1E2A4A),
+        )
+        val decoded = decodeColorCsv(palette.encodeColorCsv())
+        assertEquals(palette, decoded)
     }
 
     @Test
     fun relatedDesignsExcludesSelfAndPrioritizesSameCategory() {
-        val target = sampleDesigns.first() // Classic French Tip (FRENCH)
+        val target = sampleDesigns.first()
         val related = relatedDesigns(target, sampleDesigns, limit = 5)
         assertEquals(5, related.size)
         assertTrue(related.none { it.id == target.id })

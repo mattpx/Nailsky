@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.Card
@@ -63,9 +64,12 @@ import com.nailsky.app.ui.theme.ThemePreviews
 import com.nailsky.app.ui.theme.deepen
 import kotlinx.coroutines.delay
 
-private val CardShape = RoundedCornerShape(20.dp)
+private val CardShape = RoundedCornerShape(22.dp)
 
-/** Card for the staggered inspiration, explore, and saved grids. */
+/**
+ * Borderless photo-first lookbook card — eliminates boxy white web footers in favor of
+ * full-bleed photography with a subtle gradient scrim and floating glass heart pill.
+ */
 @Composable
 fun DesignCard(
     design: NailDesign,
@@ -78,7 +82,6 @@ fun DesignCard(
         onClick = onClick,
         modifier = modifier,
         shape = CardShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         DesignArtwork(
@@ -87,6 +90,22 @@ fun DesignCard(
                 .fillMaxWidth()
                 .aspectRatio(1f / design.heightRatio),
         ) {
+            // Top-left subtle shape pill
+            Surface(
+                shape = CircleShape,
+                color = Color.Black.copy(alpha = 0.34f),
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(10.dp),
+            ) {
+                Text(
+                    text = design.shape.label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White,
+                    modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),
+                )
+            }
+
             SaveToggle(
                 isSaved = isSaved,
                 onToggle = onToggleSave,
@@ -94,45 +113,237 @@ fun DesignCard(
                     .align(Alignment.TopEnd)
                     .padding(8.dp),
             )
-        }
-        Column(Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
-            Text(
-                text = design.title,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(Modifier.height(2.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
+
+            // Bottom gradient overlay with title & mini color swatches
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.68f),
+                            ),
+                        ),
+                    )
+                    .padding(start = 12.dp, end = 12.dp, top = 28.dp, bottom = 11.dp),
             ) {
                 Text(
-                    text = "${design.category.label} · ${design.shape.label}",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = design.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Color.White,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f),
                 )
-                Spacer(Modifier.width(6.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy((-3).dp)) {
-                    design.colors.take(3).forEach { swatch ->
-                        Box(
-                            modifier = Modifier
-                                .size(10.dp)
-                                .clip(CircleShape)
-                                .background(swatch)
-                                .border(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.surface,
-                                    shape = CircleShape,
-                                ),
-                        )
+                Spacer(Modifier.height(3.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = design.finish.label,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White.copy(alpha = 0.82f),
+                        maxLines = 1,
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy((-3).dp)) {
+                        design.colors.take(3).forEach { swatch ->
+                            Box(
+                                modifier = Modifier
+                                    .size(11.dp)
+                                    .clip(CircleShape)
+                                    .background(swatch)
+                                    .border(1.dp, Color.White.copy(alpha = 0.85f), CircleShape),
+                            )
+                        }
                     }
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Editorial "Look of the Week" full-bleed hero card for the top of the Lookbook Home screen.
+ */
+@Composable
+fun EditorialHeroCard(
+    design: NailDesign,
+    isSaved: Boolean,
+    onToggleSave: () -> Unit,
+    onClick: () -> Unit,
+    onTryInStudio: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        onClick = onClick,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(236.dp),
+        shape = RoundedCornerShape(28.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+    ) {
+        DesignArtwork(
+            design = design,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            // Frosted pill badge
+            Surface(
+                shape = CircleShape,
+                color = Color.Black.copy(alpha = 0.42f),
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(14.dp),
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.AutoAwesome,
+                        contentDescription = null,
+                        tint = Color(0xFFFFD6E5),
+                        modifier = Modifier.size(13.dp),
+                    )
+                    Text(
+                        text = "Look of the Week",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White,
+                    )
+                }
+            }
+
+            SaveToggle(
+                isSaved = isSaved,
+                onToggle = onToggleSave,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(12.dp),
+            )
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.72f)),
+                        ),
+                    )
+                    .padding(start = 18.dp, end = 14.dp, top = 36.dp, bottom = 16.dp),
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = design.title,
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color.White,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        text = "${design.shape.label} · ${design.finish.label} · ${design.artist}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color.White.copy(alpha = 0.85f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Spacer(Modifier.width(10.dp))
+                Surface(
+                    onClick = onTryInStudio,
+                    shape = CircleShape,
+                    color = Color.White.copy(alpha = 0.92f),
+                ) {
+                    Text(
+                        text = "Try Studio",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color(0xFF1E2A4A),
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** Ranked card (`#1`, `#2`, `#3`) for Explore's Weekly Top Looks strip. */
+@Composable
+fun RankedLookCard(
+    rank: Int,
+    design: NailDesign,
+    isSaved: Boolean,
+    onToggleSave: () -> Unit,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        onClick = onClick,
+        modifier = modifier
+            .width(148.dp)
+            .height(192.dp),
+        shape = RoundedCornerShape(22.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        DesignArtwork(
+            design = design,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            Surface(
+                shape = CircleShape,
+                color = when (rank) {
+                    1 -> MaterialTheme.colorScheme.tertiary
+                    2 -> MaterialTheme.colorScheme.primary
+                    else -> Color.Black.copy(alpha = 0.55f)
+                },
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(10.dp),
+            ) {
+                Text(
+                    text = "#$rank",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = if (rank == 2) MaterialTheme.colorScheme.onPrimary else Color.White,
+                    modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),
+                )
+            }
+
+            SaveToggle(
+                isSaved = isSaved,
+                onToggle = onToggleSave,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp),
+            )
+
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.72f)),
+                        ),
+                    )
+                    .padding(start = 12.dp, end = 12.dp, top = 24.dp, bottom = 10.dp),
+            ) {
+                Text(
+                    text = design.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = "${design.likesCount} saves",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White.copy(alpha = 0.82f),
+                )
             }
         }
     }
@@ -149,7 +360,7 @@ fun TrendingCard(
 ) {
     Card(
         onClick = onClick,
-        modifier = modifier.width(220.dp),
+        modifier = modifier.width(216.dp),
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
@@ -157,7 +368,7 @@ fun TrendingCard(
             design = design,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(154.dp),
+                .height(152.dp),
         ) {
             SaveToggle(
                 isSaved = isSaved,
@@ -172,10 +383,10 @@ fun TrendingCard(
                     .fillMaxWidth()
                     .background(
                         Brush.verticalGradient(
-                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.62f)),
+                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.65f)),
                         ),
                     )
-                    .padding(start = 16.dp, end = 16.dp, top = 28.dp, bottom = 12.dp),
+                    .padding(start = 14.dp, end = 14.dp, top = 28.dp, bottom = 12.dp),
             ) {
                 Text(
                     text = design.title,
@@ -185,8 +396,8 @@ fun TrendingCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = "${design.category.label} · ${design.artist}",
-                    style = MaterialTheme.typography.labelMedium,
+                    text = "${design.shape.label} · ${design.artist}",
+                    style = MaterialTheme.typography.labelSmall,
                     color = Color.White.copy(alpha = 0.85f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -266,7 +477,6 @@ private fun NailShapes(modifier: Modifier = Modifier) {
                 cornerRadius = CornerRadius(nailWidth / 2f, nailWidth / 2f),
             )
         }
-        // Little sparkles
         val sparkle = Color.White.copy(alpha = 0.6f)
         drawCircle(sparkle, radius = nailWidth * 0.12f, center = Offset(size.width * 0.18f, size.height * 0.2f))
         drawCircle(sparkle, radius = nailWidth * 0.08f, center = Offset(size.width * 0.82f, size.height * 0.78f))
@@ -301,7 +511,7 @@ fun SaveToggle(
     Surface(
         modifier = modifier,
         shape = CircleShape,
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.88f),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.82f),
     ) {
         IconToggleButton(
             checked = isSaved,
@@ -310,14 +520,14 @@ fun SaveToggle(
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onToggle()
             },
-            modifier = Modifier.size(36.dp),
+            modifier = Modifier.size(34.dp),
         ) {
             Icon(
                 imageVector = if (isSaved) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                 contentDescription = if (isSaved) "Remove from saved" else "Save design",
                 tint = if (isSaved) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(19.dp)
                     .scale(scale),
             )
         }
@@ -335,21 +545,6 @@ private fun DesignCardPreview() {
                 onToggleSave = {},
                 onClick = {},
                 modifier = Modifier.width(170.dp),
-            )
-        }
-    }
-}
-
-@ThemePreviews
-@Composable
-private fun TrendingCardPreview() {
-    NailSkyTheme {
-        Box(Modifier.padding(16.dp)) {
-            TrendingCard(
-                design = sampleDesigns[4],
-                isSaved = false,
-                onToggleSave = {},
-                onClick = {},
             )
         }
     }

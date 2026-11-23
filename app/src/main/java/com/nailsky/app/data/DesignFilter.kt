@@ -7,13 +7,15 @@ data class ExploreFilter(
     val shape: NailShape? = null,
     val finish: NailFinish? = null,
     val artist: String? = null,
+    val colorMood: ColorMood? = null,
 ) {
     val isActive: Boolean
         get() = query.isNotBlank() ||
             category != Category.ALL ||
             shape != null ||
             finish != null ||
-            artist != null
+            artist != null ||
+            colorMood != null
 
     val activeFilterCount: Int
         get() = listOf(
@@ -21,6 +23,7 @@ data class ExploreFilter(
             shape != null,
             finish != null,
             artist != null,
+            colorMood != null,
         ).count { it }
 }
 
@@ -46,8 +49,6 @@ fun filterDesigns(
             return@filter false
         }
 
-        if (tokens.isEmpty()) return@filter true
-
         val searchableText = buildString {
             append(design.title).append(' ')
             append(design.category.label).append(' ')
@@ -59,9 +60,21 @@ fun filterDesigns(
             design.tags.forEach { append(it).append(' ') }
         }.lowercase()
 
+        val matchesMood = filter.colorMood == null ||
+            filter.colorMood.keywords.any { kw -> searchableText.contains(kw) }
+
+        if (!matchesMood) return@filter false
+        if (tokens.isEmpty()) return@filter true
+
         tokens.all { token -> searchableText.contains(token) }
     }
 }
+
+/** Returns weekly ranked top looks sorted by community likes. */
+fun weeklyTopDesigns(
+    designs: List<NailDesign>,
+    limit: Int = 6,
+): List<NailDesign> = designs.sortedByDescending { it.likesCount }.take(limit)
 
 /** Returns up to [limit] related designs ranked by shared category, finish, shape, and tags. */
 fun relatedDesigns(
